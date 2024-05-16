@@ -1,4 +1,5 @@
 # SurvIntersectR
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.11206042.svg)](https://doi.org/10.5281/zenodo.11206042)
 
 **SurvIntersectR** is an R package providing tools to check if survival curves intersect and to find their intersection points. These tools are particularly useful for survival analysis in biomedical research and other fields where comparing survival rates between different groups is necessary.
 
@@ -45,3 +46,8 @@ find_surv_intersect(plot2)
 
 ## License
 This project is licensed under the MIT License.
+
+## Citation
+If you use SurvIntersectR in your research, please cite it as follows:
+
+> Pestana, D., Cardoso, C., & Castelo-Branco, P. (2024). SurvIntersectR: Tools for Detecting Survival Curve Intersections (v0.1.0). Zenodo. https://doi.org/10.5281/zenodo.11206042

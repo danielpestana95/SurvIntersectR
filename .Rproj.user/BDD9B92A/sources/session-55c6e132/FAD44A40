@@ -1,0 +1,26 @@
+{
+    "id": "FAD44A40",
+    "path": "D:/SurvIntersectR Package/SurvIntersectR/R/find_surv_intersect.R",
+    "project_path": "R/find_surv_intersect.R",
+    "type": "r_source",
+    "hash": "417141892",
+    "contents": "",
+    "dirty": false,
+    "created": 1715884827863.0,
+    "source_on_save": false,
+    "relative_order": 2,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "35,24",
+        "scrollLine": "15"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1715888075,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1715888075461,
+    "read_only": false,
+    "read_only_alternatives": []
+}

@@ -1,0 +1,24 @@
+Package: SurvIntersectR
+Type: Package
+Title: Tools for Detecting Survival Curve Intersections
+Version: 0.1.0
+Authors@R: c(
+  person("Daniel Pestana", email = "daniel.pestana95@gmail.com", role = c("aut", "cre")),
+  person("Cândida Cardoso", email = "candida.cardoso49@gmail.com", role = "aut"),
+  person("Pedro Castelo-Branco", email = "castelobranco.pedro@gmail.com", role = "ctb")
+)
+Maintainer: Daniel Pestana <daniel.pestana95@gmail.com>
+Description: A package providing tools to check if survival curves intersect and to find their intersection points.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.3.1
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Imports:
+    dplyr,
+    tidyr,
+    ggplot2,
+    survminer,
+    survival

@@ -1,0 +1,132 @@
+#' Check if Survival Curves Intersect
+#'
+#' This function checks if two survival curves intersect in a ggsurvplot object.
+#'
+#' @param ggsurvplot_object A ggsurvplot object created by the `survminer` package.
+#' @return A logical value indicating if the survival curves intersect (TRUE), do not intersect (FALSE), or if there was an error (NA).
+#' @examples
+#' \dontrun{
+#'   library(survminer)
+#'   library(survival)
+#'   library(SurvCurveTools)
+#'
+#'   # Example 1: Non-intersecting curves
+#'   data("data_no_intersect", package = "SurvCurveTools")
+#'   fit1 <- survfit(Surv(time, status) ~ group, data = data_no_intersect)
+#'   plot1 <- ggsurvplot(fit1, data = data_no_intersect)
+#'   result1 <- surv_curve_intersect(plot1)
+#'   print(result1)
+#'
+#'   # Example 2: Intersecting curves
+#'   data("data_intersect", package = "SurvCurveTools")
+#'   fit2 <- survfit(Surv(time, status) ~ group, data = data_intersect)
+#'   plot2 <- ggsurvplot(fit2, data = data_intersect)
+#'   result2 <- surv_curve_intersect(plot2)
+#'   print(result2)
+#'
+#' @export
+surv_curve_intersect <- function(ggsurvplot_object) {
+
+  
+  # Check Strata in plot
+  print(
+    paste0("Strata in Plot: ", unique(dplyr::filter(ggsurvplot_object[["plot"]][["data"]])$strata)
+           )
+  )
+  
+  if (length(unique(dplyr::filter(ggsurvplot_object[["plot"]][["data"]])$strata)) != 2) {
+    stop("This function only supports 2 strata.")
+  }
+  
+  # Extract curve data for group_1 and group_2 groups
+  group_1_df <- grep(x =  ggsurvplot_object[["plot"]][["data"]][["strata"]], pattern = unique(ggsurvplot_object[["plot"]][["data"]][["strata"]])[1])
+  curve1 <- data.frame(y=ggsurvplot_object[["plot"]][["data"]][["surv"]][group_1_df], x=ggsurvplot_object[["plot"]][["data"]][["time"]][group_1_df])
+  
+  group_2_df <- grep(x =  ggsurvplot_object[["plot"]][["data"]][["strata"]], pattern = unique(ggsurvplot_object[["plot"]][["data"]][["strata"]])[2])
+  curve2 <- data.frame(y=ggsurvplot_object[["plot"]][["data"]][["surv"]][group_2_df], x=ggsurvplot_object[["plot"]][["data"]][["time"]][group_2_df])
+  
+  ##Function to count decimal places
+  count_decimal_places <- function(nums) {
+    # Convert the numbers to strings
+    num_strs <- as.character(nums)
+    
+    # Split the strings by the decimal point
+    split_strs <- strsplit(num_strs, "\\.")
+    
+    # Apply a function to each element of the split strings
+    sapply(split_strs, function(x) {
+      if (length(x) == 2) {
+        # If there is a decimal point, count the number of characters after it
+        nchar(x[2])
+      } else {
+        # If there is no decimal point, return 0
+        0
+      }
+    })
+  }
+  
+  
+  curve1 = curve1 %>%
+    dplyr::mutate(x_dp_number = count_decimal_places(x))
+  
+  curve2 = curve2 %>%
+    dplyr::mutate(x_dp_number = count_decimal_places(x))
+  
+  maximum_decimal_places_in_both_curves = max(c(curve1$x_dp_number, curve2$x_dp_number), na.rm = TRUE)
+  
+  #Get X as integer
+  curve1 = curve1 %>%
+    dplyr::mutate(x_int = x*10^maximum_decimal_places_in_both_curves)
+  
+  curve2 = curve2 %>%
+    dplyr::mutate(x_int = x*10^maximum_decimal_places_in_both_curves)
+  
+  
+  x_data <-c()
+  y_data <- c()
+  
+  
+  for (k in 1:(length(curve2$x_int)-1)) {
+    x_data_temp <- curve2$x_int[k]:curve2$x_int[k+1]
+    y_data_temp <- rep(curve2$y[k], length(x_data_temp))
+    
+    x_data <- c(x_data, x_data_temp)
+    y_data <-c(y_data, y_data_temp)
+  }
+  
+  group_2_clean_surv_data <- data.frame(x_int = x_data, y2 = y_data)
+  group_2_clean_surv_data <- unique(group_2_clean_surv_data) %>%
+    group_by(x_int) %>%
+    summarize(y2 = min(y2, na.rm = TRUE))
+  
+  x_data <-c()
+  y_data <- c()
+  
+  for (k in 1:(length(curve1$x_int)-1)) {
+    x_data_temp <- curve1$x_int[k]:curve1$x_int[k+1]
+    y_data_temp <- rep(curve1$y[k], length(x_data_temp))
+    
+    x_data <- c(x_data, x_data_temp)
+    y_data <-c(y_data, y_data_temp)
+  }
+  
+  group_1_clean_surv_data <- data.frame(x_int = x_data, y1 = y_data)
+  group_1_clean_surv_data <- unique(group_1_clean_surv_data)%>%
+    group_by(x_int) %>%
+    summarize(y1 = min(y1, na.rm = TRUE))
+  
+  
+  all_groups_clean_surv_data = dplyr::left_join(group_1_clean_surv_data, group_2_clean_surv_data, by = "x_int")
+  
+  all_groups_clean_surv_data = all_groups_clean_surv_data %>% dplyr::mutate(sub = y2 - y1)
+  
+  all_groups_clean_surv_data = drop_na(all_groups_clean_surv_data)
+  
+  if(length(which(all_groups_clean_surv_data$sub >= 0)) ==  length(all_groups_clean_surv_data$sub) | length(which(all_groups_clean_surv_data$sub <= 0)) ==  length(all_groups_clean_surv_data$sub)){
+    return(FALSE)
+    
+  }else{
+    return(TRUE)
+  }
+  
+}

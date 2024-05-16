@@ -14,7 +14,7 @@ To install the development version of SurvIntersectR from GitHub, use the follow
 install.packages("devtools")
 
 # Install SurvIntersectR from GitHub
-devtools::install_github("yourusername/SurvIntersectR")
+devtools::install_github("SurvIntersectR/SurvIntersectR")
 ```
 
 ## Basic Usage Example
